@@ -1,5 +1,8 @@
 # go-jsonrpc2glib
-Help developer create server compatibly `jsonrpc-glib-1.0` .Use `github.com/powerman/rpc-codec/jsonrpc2` inside.
+Help developer create server compatibly `jsonrpc-glib-1.0` .
+
+Use `github.com/powerman/rpc-codec/jsonrpc2` inside.
+
 帮助程序员开发兼容`jsonrpc-glib-1.0`的`jsonrpc2`服务器。
 
 ### Install
