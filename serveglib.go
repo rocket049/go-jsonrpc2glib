@@ -4,7 +4,6 @@ package jsonrpc2glib
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -38,7 +37,7 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 			return 0, err
 		}
 		if strings.HasPrefix(string(line1), "Content-Length:") == false {
-			return 0, errors.New("Error request format")
+			return 0, NewError(-32700, "parse error")
 		}
 		lenData, err := strconv.ParseInt(string(line1[16:]), 10, 32)
 		if err != nil {
