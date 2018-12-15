@@ -3,7 +3,7 @@ package jsonrpc2glib
 
 import (
 	"bufio"
-	"errors"
+	"bytes"
 	"fmt"
 	"io"
 	"net"
