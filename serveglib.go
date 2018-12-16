@@ -82,6 +82,7 @@ func (c *MyConn) Close() error {
 	return nil
 }
 
+//ServeGlib create serve, it will use DefaultServer if srv==nil.
 func ServeGlib(conn net.Conn, srv *rpc.Server) {
 	c := NewMyConn(conn)
 	if srv == nil {
