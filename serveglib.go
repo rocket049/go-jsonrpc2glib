@@ -10,10 +10,14 @@ import (
 	"net/rpc"
 	"strconv"
 	"strings"
+	"os"
 
 	"github.com/powerman/rpc-codec/jsonrpc2"
 )
-
+var debug bool
+func DebugMode(mode bool){
+	debug = mode
+}
 func NewMyConn(c net.Conn) *MyConn {
 	p := &MyConn{Conn: c}
 	p.Init()
@@ -58,6 +62,9 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 		p[c.left] = 10
 		n = c.left + 1
 		c.left = 0
+		if debug{
+			os.Stdout.Write(p[:n])
+		}
 		return n, nil
 	} else {
 		n, err = io.ReadFull(c.reader1, p[:lenP-1])
@@ -65,11 +72,17 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 			return 0, err
 		}
 		c.left -= n
+		if debug{
+			os.Stdout.Write(p[:n])
+		}
 		return n, nil
 	}
 }
 
 func (c *MyConn) Write(p []byte) (n int, err error) {
+	if debug{
+			os.Stdout.Write(p)
+	}
 	buf := bytes.NewBufferString("Content-Length: ")
 	buf.WriteString(fmt.Sprintf("%d\r\n\r\n", len(p)-1))
 	buf.Write(p[:len(p)-1])
@@ -90,3 +103,4 @@ func ServeGlib(conn net.Conn, srv *rpc.Server) {
 	}
 	rpc.ServeCodec(jsonrpc2.NewServerCodec(c, srv))
 }
+
