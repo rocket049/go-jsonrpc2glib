@@ -80,6 +80,9 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 }
 
 func (c *MyConn) Write(p []byte) (n int, err error) {
+	if debug{
+			os.Stdout.Write(p)
+	}
 	buf := bytes.NewBufferString("Content-Length: ")
 	buf.WriteString(fmt.Sprintf("%d\r\n\r\n", len(p)-1))
 	buf.Write(p[:len(p)-1])
