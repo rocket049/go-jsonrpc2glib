@@ -33,7 +33,7 @@ type MyConn struct {
 func (c *MyConn) Init() {
 	c.reader1 = bufio.NewReader(c.Conn)
 }
-
+var parseErr = jsonrpc2.NewError(-32700, "parse error")
 func (c *MyConn) Read(p []byte) (n int, err error) {
 	if c.left == 0 {
 		line1, _, err := c.reader1.ReadLine()
@@ -41,7 +41,7 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 			return 0, err
 		}
 		if strings.HasPrefix(string(line1), "Content-Length:") == false {
-			return 0, jsonrpc2.NewError(-32700, "parse error")
+			return 0, parseErr
 		}
 		lenData, err := strconv.ParseInt(string(line1[16:]), 10, 32)
 		if err != nil {
