@@ -4,18 +4,21 @@ package jsonrpc2glib
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/rpc"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 
 	"github.com/powerman/rpc-codec/jsonrpc2"
 )
+
 var debug bool
-func DebugMode(mode bool){
+
+func DebugMode(mode bool) {
 	debug = mode
 }
 func NewMyConn(c net.Conn) *MyConn {
@@ -62,7 +65,7 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 		p[c.left] = 10
 		n = c.left + 1
 		c.left = 0
-		if debug{
+		if debug {
 			os.Stdout.Write(p[:n])
 		}
 		return n, nil
@@ -72,7 +75,7 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 			return 0, err
 		}
 		c.left -= n
-		if debug{
+		if debug {
 			os.Stdout.Write(p[:n])
 		}
 		return n, nil
@@ -80,14 +83,28 @@ func (c *MyConn) Read(p []byte) (n int, err error) {
 }
 
 func (c *MyConn) Write(p []byte) (n int, err error) {
-	if debug{
-			os.Stdout.Write(p)
+	if debug {
+		os.Stdout.Write(p)
 	}
 	buf := bytes.NewBufferString("Content-Length: ")
 	buf.WriteString(fmt.Sprintf("%d\r\n\r\n", len(p)-1))
 	buf.Write(p[:len(p)-1])
 	num, err := io.Copy(c.Conn, buf)
 	return int(num), err
+}
+
+func (c *MyConn) Notify(method string, params interface{}) error {
+	msgbuf := bytes.NewBufferString(`{"jsonrpc":"2.0","method":"`)
+	msgbuf.WriteString(method)
+	msgbuf.WriteString(`","params":`)
+	param, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+	msgbuf.Write(param)
+	msgbuf.WriteString("}")
+	_, err = c.Write(msgbuf.Bytes())
+	return err
 }
 
 func (c *MyConn) Close() error {
