@@ -1,4 +1,4 @@
-#新的变化
+# 新的变化
 
 2019-01-01 支持`jsonrpc-glib-1.0`的`notify`消息，调用方法 `Notify(method string, params interface{})`.示例：
 
