@@ -104,7 +104,7 @@ func (c *MyConn) Notify(method string, params interface{}) error {
 		return err
 	}
 	msgbuf.Write(param)
-	msgbuf.WriteString("}")
+	msgbuf.WriteString("}\n")
 	_, err = c.Write(msgbuf.Bytes())
 	return err
 }
