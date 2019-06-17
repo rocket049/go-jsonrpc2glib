@@ -18,9 +18,12 @@ import (
 
 var debug bool
 
+//DebugMode Set debug mode to print log message.
 func DebugMode(mode bool) {
 	debug = mode
 }
+
+//NewMyConn Create a MyConn and initialize it.
 func NewMyConn(c net.Conn) *MyConn {
 	p := &MyConn{Conn: c}
 	p.Init()
@@ -33,6 +36,7 @@ type MyConn struct {
 	reader1 *bufio.Reader
 }
 
+//Init initialize a MyConn struct
 func (c *MyConn) Init() {
 	c.reader1 = bufio.NewReader(c.Conn)
 }
@@ -95,6 +99,7 @@ func (c *MyConn) Write(p []byte) (n int, err error) {
 	return int(num), err
 }
 
+//Notify Compatible notify function in jsonrpc2glib
 func (c *MyConn) Notify(method string, params interface{}) error {
 	msgbuf := bytes.NewBufferString(`{"jsonrpc":"2.0","method":"`)
 	msgbuf.WriteString(method)
@@ -114,7 +119,15 @@ func (c *MyConn) Close() error {
 	return nil
 }
 
-//ServeGlib create serve, it will use DefaultServer if srv==nil.
+//ServeGlib Create rpc server from this connection, it will use DefaultServer if srv==nil.
+func (c *MyConn) ServeGlib(srv *rpc.Server) {
+	if srv == nil {
+		srv = rpc.DefaultServer
+	}
+	rpc.ServeCodec(jsonrpc2.NewServerCodec(c, srv))
+}
+
+//ServeGlib create rpc server from net.Conn, it will use DefaultServer if srv==nil.
 func ServeGlib(conn net.Conn, srv *rpc.Server) {
 	c := NewMyConn(conn)
 	if srv == nil {
